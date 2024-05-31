@@ -1,0 +1,3 @@
+filename,basename,toolid,toolmode,parser_version,runid,start,duration,exit_code,findings,infos,errors,fails
+smartbugs-dataset/short_addresses/short_address_example.sol,short_address_example.sol,mythril-0.24.7,solidity,2024/03/24,20240523_1636,1716482203.5418801,17.53667402267456,1,{Exception_State_SWC_110},{},{},{}
+smartbugs-dataset/short_addresses/short_address_example.sol,short_address_example.sol,slither,solidity,2022/11/14,20240523_1636,1716482203.541856,1.1078579425811768,4,"{external_function,naming_convention,solc_version}",{},{EXIT_CODE_4},{}

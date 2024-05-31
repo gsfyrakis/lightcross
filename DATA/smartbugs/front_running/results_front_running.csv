@@ -1,0 +1,9 @@
+filename,basename,toolid,toolmode,parser_version,runid,start,duration,exit_code,findings,infos,errors,fails
+smartbugs-dataset/front_running/ERC20.sol,ERC20.sol,mythril-0.24.7,solidity,2024/03/24,20240518_2050,1716065472.4629939,130.74652433395386,0,{},{},{},{}
+smartbugs-dataset/front_running/FindThisHash.sol,FindThisHash.sol,mythril-0.24.7,solidity,2024/03/24,20240518_2050,1716065462.9275992,8.861879825592041,0,{},{},{},{}
+smartbugs-dataset/front_running/eth_tx_order_dependence_minimal.sol,eth_tx_order_dependence_minimal.sol,mythril-0.24.7,solidity,2024/03/24,20240518_2050,1716065461.487114,17.595545053482056,1,"{Transaction_Order_Dependence_SWC_114,Unprotected_Ether_Withdrawal_SWC_105}",{},{},{}
+smartbugs-dataset/front_running/odds_and_evens.sol,odds_and_evens.sol,mythril-0.24.7,solidity,2024/03/24,20240518_2050,1716065479.796809,30.05646800994873,1,"{Exception_State_SWC_110,Unchecked_return_value_from_external_call_SWC_104,Unprotected_Ether_Withdrawal_SWC_105}",{},{},{}
+smartbugs-dataset/front_running/ERC20.sol,ERC20.sol,slither,solidity,2022/11/14,20240518_2050,1716065462.218705,0.7073802947998047,7,"{constable_states,external_function,unused_state}",{},{EXIT_CODE_7},{}
+smartbugs-dataset/front_running/FindThisHash.sol,FindThisHash.sol,slither,solidity,2022/11/14,20240518_2050,1716065471.790787,0.6707742214202881,5,"{arbitrary_send,deprecated_standards,external_function,naming_convention,solc_version}",{},{EXIT_CODE_5},{}
+smartbugs-dataset/front_running/eth_tx_order_dependence_minimal.sol,eth_tx_order_dependence_minimal.sol,slither,solidity,2022/11/14,20240518_2050,1716065461.487181,0.7290582656860352,4,"{external_function,naming_convention,solc_version}",{},{EXIT_CODE_4},{}
+smartbugs-dataset/front_running/odds_and_evens.sol,odds_and_evens.sol,slither,solidity,2022/11/14,20240518_2050,1716065479.084623,0.7106609344482422,7,"{arbitrary_send,deprecated_standards,external_function,naming_convention,solc_version}",{},{EXIT_CODE_7},{}

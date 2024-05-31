@@ -1,0 +1,13 @@
+filename,basename,toolid,toolmode,parser_version,runid,start,duration,exit_code,findings,infos,errors,fails
+smartbugs-dataset/denial_of_service/auction.sol,auction.sol,mythril-0.24.7,solidity,2024/03/24,20240518_2048,1716065344.2635279,19.978881120681763,1,{Transaction_Order_Dependence_SWC_114},{},{},{}
+smartbugs-dataset/denial_of_service/dos_address.sol,dos_address.sol,mythril-0.24.7,solidity,2024/03/24,20240518_2048,1716065313.762105,6.563148021697998,0,{},{},{},{}
+smartbugs-dataset/denial_of_service/dos_number.sol,dos_number.sol,mythril-0.24.7,solidity,2024/03/24,20240518_2048,1716065321.006282,14.635112762451172,0,{},{},{},{}
+smartbugs-dataset/denial_of_service/dos_simple.sol,dos_simple.sol,mythril-0.24.7,solidity,2024/03/24,20240518_2048,1716065337.689197,5.875268936157227,0,{},{},{},{}
+smartbugs-dataset/denial_of_service/list_dos.sol,list_dos.sol,mythril-0.24.7,solidity,2024/03/24,20240518_2048,1716065313.7620192,66.72291779518127,1,"{Dependence_on_predictable_environment_variable_SWC_116,Exception_State_SWC_110,Unchecked_return_value_from_external_call_SWC_104}",{},{},{}
+smartbugs-dataset/denial_of_service/send_loop.sol,send_loop.sol,mythril-0.24.7,solidity,2024/03/24,20240518_2048,1716065364.243893,10.916059970855713,1,"{Multiple_Calls_in_a_Single_Transaction_SWC_113,Transaction_Order_Dependence_SWC_114}",{},{},{}
+smartbugs-dataset/denial_of_service/auction.sol,auction.sol,slither,solidity,2022/11/14,20240518_2048,1716065336.318971,0.6664280891418457,2,"{external_function,solc_version}",{},{EXIT_CODE_2},{}
+smartbugs-dataset/denial_of_service/dos_address.sol,dos_address.sol,slither,solidity,2022/11/14,20240518_2048,1716065343.565747,0.6961960792541504,4,{external_function},{},{EXIT_CODE_4},{}
+smartbugs-dataset/denial_of_service/dos_number.sol,dos_number.sol,slither,solidity,2022/11/14,20240518_2048,1716065335.642946,0.674462080001831,5,{external_function},{},{EXIT_CODE_5},{}
+smartbugs-dataset/denial_of_service/dos_simple.sol,dos_simple.sol,slither,solidity,2022/11/14,20240518_2048,1716065320.326995,0.6778340339660645,1,{external_function},{},{EXIT_CODE_1},{}
+smartbugs-dataset/denial_of_service/list_dos.sol,list_dos.sol,slither,solidity,2022/11/14,20240518_2048,1716065375.1614988,0.7529342174530029,10,"{external_function,naming_convention,solc_version,timestamp}",{},{EXIT_CODE_10},{}
+smartbugs-dataset/denial_of_service/send_loop.sol,send_loop.sol,slither,solidity,2022/11/14,20240518_2048,1716065336.9868019,0.7009673118591309,4,"{calls_loop,external_function,uninitialized_local,uninitialized_state}",{},{EXIT_CODE_4},{}

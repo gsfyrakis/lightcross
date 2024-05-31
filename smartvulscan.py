@@ -5,6 +5,7 @@
  Copyright Teesside University 2024
 """
 import csv
+import resource
 import subprocess
 import sys
 import os
@@ -44,10 +45,24 @@ def process_files(file_paths):
     return result
 
 
+# def set_resource_limits():
+#     # maximum CPU time to 30 minutes (1800 seconds)
+#     resource.setrlimit(resource.RLIMIT_CPU, (1800, 1800))
+#
+#     # maximum memory usage is 4 GB
+#     resource.setrlimit(resource.RLIMIT_AS, (4 * 1024 * 1024 * 1024, 4 * 1024 * 1024 * 1024))
+#
+#     # maximum number of open file descriptors is 1024
+#     resource.setrlimit(resource.RLIMIT_NOFILE, (1024, 1024))
+
+
+def set_resource_limits() -> None:
+    resource.setrlimit(resource.RLIMIT_CPU, (1800, 1800))
+    resource.setrlimit(resource.RLIMIT_AS, (4 * 1024 * 1024 * 1024, 4 * 1024 * 1024 * 1024))
+
+
 def analyse_smart_contract_with_slither(file_path):
     try:
-        # start_time_slither = time.time()
-
         with open('syslog-slither.txt', 'w') as f:
             print(file_path)
             start_time_slither = time.time()
@@ -59,10 +74,9 @@ def analyse_smart_contract_with_slither(file_path):
             results = format_results(s_output, file_path, elapsed_time_slither)
             return results
 
-    except subprocess.SubprocessError as e:
+    except subprocess.CalledProcessError as e:
         print("Slither analysis failed.")
-        print(e.stderr)
-        logging.error(f"Error: {e.output.decode('utf-8')}")
+        print(f"Command failed with error {e.returncode}, output: {e.output}")
         sys.exit(1)
 
 
@@ -81,13 +95,12 @@ def analyse_smart_contract_with_mythril(file_path):
             results_mythril = parse_mythril_output(s_output, file_path, elapsed_time_mythril)
             return results_mythril
 
-    except subprocess.SubprocessError as e:
+    except subprocess.CalledProcessError as e:
         print("Mythril analysis failed.")
-        print(e.stderr)
-        logging.error(f"Error: {e.output.decode('utf-8')}")
+        print(f"Command failed with error {e.returncode}, output: {e.output}")
         sys.exit(1)
 
-import re
+
 
 def parse_mythril_output_int(output):
     issues = []
@@ -150,7 +163,6 @@ def parse_mythril_output_int(output):
 
     if current_issue:
         issues.append(current_issue)
-
     return issues
 
 
@@ -178,26 +190,26 @@ def parse_mythril_output(output, file_name, tool_time):
             for line in issue['transaction_sequence']:
                 print(f"  {line}")
         print()
-    # # TODO make pattern more efficient
-    # pattern = r"==== (.+?) ====\n(SWC ID: \d+\nSeverity: \w+\nContract: \w+\nFunction name: \w+\(\)?\n(?:PC address: \d+\n(?:Estimated Gas Usage: \d+ - \d+\n)?)?(.+?)\n--------------------\nIn file: (.+?)\n\n(.+?)\n\n--------------------)"
-    # print("this is the output: \n")
-    # print(output)
-    # matches = re.findall(pattern, output, re.DOTALL)
-    #
-    # for match in matches:
-    #     title, details, description, file_line, code = match
-    #     # Extract SWC ID
-    #     swc_id = re.search(r"SWC ID: (\d+)", details).group(1)
-    #     print(f"SWC ID: {swc_id}")
-    #     # Extract vulnerability severity
-    #     severity = re.search(r"Severity: (\w+)", details).group(1)
-    #
-    #     # Extract contract name
-    #     contract = re.search(r"Contract: (\w+)", details).group(1)
-    #
-    #     description = ""  #re.search(r"Estimated Gas Usage: (\d+ - \d+)", details).group(1)
-    #
-    #     remediation = re.search(r"(.+?)\n--------------------\n", details).group(1)
+        # # TODO make pattern more efficient
+        # pattern = r"==== (.+?) ====\n(SWC ID: \d+\nSeverity: \w+\nContract: \w+\nFunction name: \w+\(\)?\n(?:PC address: \d+\n(?:Estimated Gas Usage: \d+ - \d+\n)?)?(.+?)\n--------------------\nIn file: (.+?)\n\n(.+?)\n\n--------------------)"
+        # print("this is the output: \n")
+        # print(output)
+        # matches = re.findall(pattern, output, re.DOTALL)
+        #
+        # for match in matches:
+        #     title, details, description, file_line, code = match
+        #     # Extract SWC ID
+        #     swc_id = re.search(r"SWC ID: (\d+)", details).group(1)
+        #     print(f"SWC ID: {swc_id}")
+        #     # Extract vulnerability severity
+        #     severity = re.search(r"Severity: (\w+)", details).group(1)
+        #
+        #     # Extract contract name
+        #     contract = re.search(r"Contract: (\w+)", details).group(1)
+        #
+        #     description = ""  #re.search(r"Estimated Gas Usage: (\d+ - \d+)", details).group(1)
+        #
+        #     remediation = re.search(r"(.+?)\n--------------------\n", details).group(1)
 
         vulnerability = {
             "title": issue['title'],
@@ -228,7 +240,7 @@ def format_results(s_output, file_name, tool_time):
     # Regex to extract useful info
     desc_regex = r"Reference: (.*)"
     sev_regex = r"INFO:Detectors:"
-    # TODO add regular expressions tailored to each security tool to extract the required vulnerability information
+    # TODO: add regular expressions tailored to each security tool to extract the required vulnerability information
 
     # Initialize output list of lists
     output = []
@@ -328,31 +340,42 @@ def main():
         "=========================================================\n\n"
     )
     contract_files = []
-    # TODO add argument for representing the target folder
-    for root, dirs, files in os.walk(file_path):
-        for file in files:
-            if file.endswith('.sol'):
-                print(os.path.join(root, file) + "\n")
-                contract_files.append(os.path.join(root, file))
 
-    three_files = contract_files  #[1:2]
+    # if the path is a folder
+    if os.path.isdir(file_path):
+        for root, dirs, files in os.walk(file_path):
+            for file in files:
+                if file.endswith('.sol'):
+                    print(os.path.join(root, file) + "\n")
+                    contract_files.append(os.path.join(root, file))
 
-    formatted_output = []
+        three_files = contract_files
 
-    for cfile in three_files:
-        print("\n > analyzing file: " + cfile + "\n")
-        slither_output = analyse_smart_contract_with_slither(cfile)
+        formatted_output = []
+
+        for cfile in three_files:
+            print("\n > analyzing file: " + cfile + "\n")
+            slither_output = analyse_smart_contract_with_slither(cfile)
+            for slither_out in slither_output:
+                formatted_output.append(slither_out)
+            # formatted_output.append(slither_output )
+            mythril_output = analyse_smart_contract_with_mythril(cfile)
+            for out in mythril_output:
+                # print(out)
+                formatted_output.append(out)
+
+        create_csv(dynamic_output_filename, formatted_output)
+    else:
+        print("\n > analyzing file: " + file_path + "\n")
+        slither_output = analyse_smart_contract_with_slither(file_path)
+        formatted_output = []
         for slither_out in slither_output:
             formatted_output.append(slither_out)
         # formatted_output.append(slither_output )
-        mythril_output = analyse_smart_contract_with_mythril(cfile)
+        mythril_output = analyse_smart_contract_with_mythril(file_path)
         for out in mythril_output:
             # print(out)
             formatted_output.append(out)
-
-    create_csv(dynamic_output_filename, formatted_output)
-
-    # create_markdown(dynamic_output_filename)
 
     elapsed_time = time.time() - start_time
 
