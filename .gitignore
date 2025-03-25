@@ -163,3 +163,4 @@ cython_debug/
 /.idea
 /syslog-slither.txt
 /syslog-mythril.txt
+.DS_Store
