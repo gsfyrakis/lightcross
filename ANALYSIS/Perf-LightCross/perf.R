@@ -10,14 +10,42 @@ categories <- c(
   "front_running",
   "other",
   "reentrancy",
-  "short_addresses",
+#  "short_addresses",
   "time_manipulation",
   "unchecked_low_level_calls"
 )
 lightcross_path <- "../../DATA/lightcross/"
 smartbugs_path <- "../../DATA/smartbugs/"
+data_path <-"../../DATA/vulnerabilities.csv"
+data_filename <-"vulnerabilities"
 figures_path <- "../../figures/"
 #perfData <- data_frame()
+
+
+vulnerabilities_df <- read.csv(data_path)
+
+# Count the number of vulnerabilities per file and per folder
+df_count <- vulnerabilities_df %>%
+  group_by(Filename, Vulnerability) %>%
+  summarise(count_file = n())
+
+# Print the result
+print(df_count)
+write.csv(df_count, "vuln-per-file.csv", row.names = FALSE)
+
+
+# Count the number of vulnerabilities per file and per folder
+df_summary <- vulnerabilities_df %>%
+  group_by(Folder, Filename, Vulnerability) %>%
+  summarise(count_file = n()) %>%
+  group_by(Folder) %>%
+  summarise(vulnerabilities_category = sum(count_file))
+
+# Print the result
+print(df_summary)
+write.csv(df_summary, "vuln-per-category.csv", row.names = FALSE)
+
+
 
 # process csv files for the path and categories
 process_csvs <- function(light_path, smartbugs_path, category) {
@@ -28,7 +56,7 @@ process_csvs <- function(light_path, smartbugs_path, category) {
   smartbugs_csvs <- retrieve_all_csv_files(trimws(paste(smartbugs_path, category, sep = "")))
 
   light_csvs$filename <- basename(light_csvs$File)
-print(distinct(light_csvs))
+  print(distinct(light_csvs))
 
   light_csvs_df <- data.frame(
     contract = light_csvs$filename,
@@ -37,6 +65,8 @@ print(distinct(light_csvs))
   )
   df_lightcross <- bind_rows(light_csvs_df, .id = "expID")
   df_lightcross['Tool'] = 'lightcross'
+
+  df_lightcross$'Category' <- category
 
 #  print(distinct(df_lightcross))
 
@@ -51,20 +81,22 @@ print(distinct(light_csvs))
   )
   df_smartbugs <- bind_rows(smartbugs_csvs_df, .id = "expID")
   df_smartbugs['Tool'] = 'smartbugs'
+  df_smartbugs$'Category' <- category
+
   perfData <- rbind(df_lightcross, df_smartbugs)
 
   #perfData <- distinct(subset(perfData, execution_time <= 4000))
   perfData <- distinct(perfData)
-rawData<- distinct(perfData)
+  rawData <- distinct(perfData)
 
   # limit rows to 100
   # perfData<-head(perfData, n = 400)
 
-  ggplot(perfData, aes(x = contract, y = execution_time, fill = Tool)) +
-    geom_bar(stat = "identity", position = "dodge") +
-    labs(x = "Contract", y = "Execution Time (sec)", fill = "Tool") +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  # ggplot(perfData, aes(x = contract, y = execution_time, fill = Tool)) +
+  #   geom_bar(stat = "identity", position = "dodge") +
+  #   labs(x = "Contract", y = "Execution Time (sec)", fill = "Tool") +
+  #   theme_minimal() +
+  #   theme(axis.text.x = element_text(angle = 45, hjust = 1))
   #ggsave(paste("tools-barplot_", category, ".pdf"), path = "figures/")
 
   perfData_slither <- distinct(subset(perfData, scanner == "slither"))
@@ -75,7 +107,7 @@ rawData<- distinct(perfData)
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-  ggsave(paste("slither-barplot_", category, ".pdf"), path = "figures/")
+  ggsave(paste("slither-barplot_", category, ".pdf", sep = ""), path = "figures/")
 
   perfData_mythril <- distinct(subset(perfData, scanner == "mythril"))
   ggplot(perfData_mythril,
@@ -85,20 +117,70 @@ rawData<- distinct(perfData)
     # theme_minimal() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-  ggsave(paste("mythril-barplot_", category, ".pdf"), path = "figures/")
-  return(df_lightcross)
+  ggsave(paste("mythril-barplot_", category, ".pdf", sep = ""), path = "figures/")
+  return(perfData)
 
 }
 
+
+result_df<- data_frame()
 for (category in categories) {
   data <- process_csvs(lightcross_path, smartbugs_path, category)
+  result_df <- rbind(result_df, data)
 }
 
 
+ggplot(result_df, aes(x = factor(Tool), y = execution_time, fill = Category)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ Category)+
+  labs(x = "Tool",
+       y = "Execution Time") +
+  theme_minimal()
 
 
+(lightPerfMean <- data_summary(result_df, varname = "execution_time", groupnames = c( "scanner", "Tool", "Category")))
+ggplot(lightPerfMean, aes(x = Category, y = mean, fill = Tool)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "Category",
+       y = "Execution Time (sec)",
+       fill = "Tool") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ ggsave("tool-barplot.pdf", path= "figures", width = 18, height = 20, unit = "cm")
+library(huxtable)
+hux <-as_hux(lightPerfMean)
+print_latex(hux)
+
+library(kableExtra)
+lPerfMean <-lightPerfMean[ , head(seq_along(lightPerfMean), -3)]
+kbl(lPerfMean, booktabs = T, format="latex")
+
+perfData_slither <- distinct(subset(lightPerfMean, scanner == "slither"))
+
+ ggplot(perfData_slither, aes(x = Category, y = mean, fill = Tool)) +
+   geom_bar(stat = "identity", position = "dodge") +
+   labs(x = "Category",
+        y = "Mean Execution Time (sec)",
+        fill = "Tool") +
+   theme_minimal() +
+   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+  ggsave("slither-barplot.pdf", path= "figures", width = 18, height = 20, unit = "cm")
+
+   perfData_mythril <- distinct(subset(lightPerfMean, scanner == "mythril"))
+
+ ggplot(perfData_mythril, aes(x = Category, y = mean, fill = Tool)) +
+   geom_bar(stat = "identity", position = "dodge") +
+   labs(x = "Category",
+        y = "Mean Execution Time (sec)",
+        fill = "Tool") +
+   theme_minimal() +
+   theme(axis.title = element_text(colour = "black", size = 16, face = "plain")) +
+    theme(axis.text = element_text(colour = "black", size = 16, face = "plain"))  +
+    theme(legend.text = element_text(colour = "black", size = 16, face = "plain"))  +
+   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+  ggsave("mythril-barplot.pdf", path= "figures", width = 18, height = 20, unit = "cm")
 
 
-
-
-#

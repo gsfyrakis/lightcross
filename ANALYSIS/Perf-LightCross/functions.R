@@ -1,8 +1,58 @@
 retrieve_all_csv_files<-function(folder_path){
-  csv_files <- list.files(path = folder_path, pattern = "*.csv", full.names = TRUE)
-  data_list <- lapply(csv_files, read.csv)
-  combined<-do.call(rbind, data_list)
-  return (combined)
+  csv_files <- list.files(path = folder_path, pattern = "*.csv", recursive = TRUE, full.names = TRUE)
+  # data_list <- lapply(csv_files, read.csv)
+  # combined<-do.call(rbind, data_list)
+  return (csv_files)
+}
+
+
+combine_csv_files_base_r <- function(main_folder_path) {
+  # Get all CSV file paths recursively
+  csv_files <- list.files(path = main_folder_path,
+                          pattern = "\\.csv$",
+                          recursive = TRUE,
+                          full.names = TRUE)
+
+  # Check if any CSV files were found
+  if (length(csv_files) == 0) {
+    stop("No CSV files found in the specified folder and subfolders.")
+  }
+
+  # Use lapply to process all files
+  df_list <- lapply(csv_files, function(file_path) {
+    # Extract subfolder name
+    subfolder <- basename(dirname(file_path))
+    print(file_path)
+    # Read the CSV file with comma delimiter
+    result <- tryCatch({
+      temp_df <- read.csv(file_path,
+                          sep = ",",
+                          stringsAsFactors = FALSE,
+                          check.names = TRUE)
+
+      # Add source information
+      temp_df$source_file <- basename(file_path)
+      temp_df$subfolder <- subfolder
+
+      return(temp_df)
+    }, error = function(e) {
+      warning(paste("Error reading file:", file_path, "-", e$message))
+      return(NULL)
+    })
+
+    return(result)
+  })
+
+  # Remove NULL entries (files that couldn't be read)
+  df_list <- df_list[!sapply(df_list, is.null)]
+
+  # Combine all dataframes
+  if (length(df_list) > 0) {
+    combined_df <- do.call(rbind, df_list)
+    return(combined_df)
+  } else {
+    stop("No dataframes were successfully created from the CSV files.")
+  }
 }
 
 data_summary <- function(data, varname, groupnames) {

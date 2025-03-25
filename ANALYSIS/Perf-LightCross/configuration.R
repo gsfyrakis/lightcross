@@ -5,8 +5,8 @@ options("scipen" = 3)
 theme_set(
   theme_light() +
     theme(
-      axis.title = element_text(colour = "black", size = 12, face = "plain"),
-      axis.text = element_text(colour = "black", size = 10, face = "plain"),
+      axis.title = element_text(colour = "black", size = 16, face = "plain"),
+      axis.text = element_text(colour = "black", size = 16, face = "plain"),
       # strip.text.x = element_text(colour = "black", size = 14, face = "bold"),
       strip.background = element_blank(),
       strip.placement = "outside"
