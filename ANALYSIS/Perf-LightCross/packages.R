@@ -24,3 +24,5 @@ library(renv)
 library(readr)
 library(kableExtra)
 library(huxtable)
+library(purrr)  # For map functions
+
