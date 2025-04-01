@@ -89,7 +89,7 @@ def analyse_smart_contract_with_slither(file_path):
 def analyse_smart_contract_with_mythril(file_path):
     print("myth analyze: " + file_path + "\n")
     # TODO add parameter execution timeout for mythril added from command line
-    timeout = "900"
+    timeout = "2000"
     params_execution_timeout = "--execution-timeout"
 
     try:
