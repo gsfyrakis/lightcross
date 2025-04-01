@@ -5,6 +5,19 @@ retrieve_all_csv_files<-function(folder_path){
   return (csv_files)
 }
 
+# Function to extract filename from a path that includes line numbers
+extract_filename <- function(path_with_lines) {
+  # Split by the # character and take the first part
+  parts <- strsplit(path_with_lines, "#")[[1]]
+  filename <- parts[1]
+
+  # If there's a directory path, extract just the filename
+  if (grepl("/", filename)) {
+    filename <- basename(filename)
+  }
+
+  return(filename)
+}
 
 combine_csv_files_base_r <- function(main_folder_path) {
   # Get all CSV file paths recursively
