@@ -261,6 +261,38 @@ def parse_mythril_output(output, file_name, tool_time):
     return vulnerabilities
 
 
+def map_slither_to_swc(issue_name):
+    slither_to_swc = {
+        # High severity
+        "arbitrary-send-eth": "105",  # SWC-105: Unprotected Ether Withdrawal
+        "controlled-delegatecall": "112",  # SWC-112: Delegatecall to Untrusted Callee
+        "tx-origin": "115",  # SWC-115: Authorization through tx.origin
+        "controlled-array-length": "124",  # SWC-124: Write to Arbitrary Storage Location
+        "reentrancy-eth": "107",  # SWC-107: Reentrancy
+        "reentrancy-no-eth": "107",  # SWC-107: Reentrancy
+        "uninitialized-state": "109",  # SWC-109: Uninitialized Storage Pointer
+        "uninitialized-storage": "109",  # SWC-109: Uninitialized Storage Pointer
+
+        # Medium severity
+        "divide-before-multiply": "101",  # SWC-101: Integer Overflow and Underflow
+        "unchecked-send": "104",  # SWC-104: Unchecked Call Return Value
+        "unchecked-lowlevel": "104",  # SWC-104: Unchecked Call Return Value
+        "unchecked-transfer": "104",  # SWC-104: Unchecked Call Return Value
+        "unused-return": "104",  # SWC-104: Unchecked Call Return Value
+        "locked-ether": "132",  # SWC-132: Unexpected Ether Balance
+        "tautology": "135",  # SWC-135: Code With No Effects
+        "weak-prng": "120",  # SWC-120: Weak Sources of Randomness
+        "encode-packed-collision": "133",  # SWC-133: Hash Collisions With Multiple Variable Length Arguments
+
+        # Low severity
+        "constant-function-asm": "127",  # SWC-127: Arbitrary Jump with Function Type Variable
+        "erc20-interface": "129",  # SWC-129: Typographical Error
+        "incorrect-equality": "132",  # SWC-132: Unexpected Behavior
+        "shadowing-state": "119",  # SWC-119: Shadowing State Variables
+    }
+
+    return slither_to_swc.get(issue_name, "Unknown")
+
 def format_results(s_output, file_name, tool_time):
     # Regex to extract useful info
     desc_regex = r"Reference: (.*)"
@@ -326,6 +358,8 @@ def format_results(s_output, file_name, tool_time):
                 "location": file_location,
                 "description": description
             })
+
+            swc_id = map_slither_to_swc(issue_name)
 
         output.append(
             ["slither", file_location, contract_name, issue_name, impact, "SWC-ID: https://swcregistry.io/docs/SWC-" + swc_id, confidence, "",
@@ -478,10 +512,10 @@ def main():
             for slither_out in slither_output:
                 formatted_output.append(slither_out)
             # formatted_output.append(slither_output )
-            mythril_output = analyse_smart_contract_with_mythril(cfile)
-            for out in mythril_output:
-                # print(out)
-                formatted_output.append(out)
+            # mythril_output = analyse_smart_contract_with_mythril(cfile)
+            # for out in mythril_output:
+            #     # print(out)
+            #     formatted_output.append(out)
 
 
     else:
