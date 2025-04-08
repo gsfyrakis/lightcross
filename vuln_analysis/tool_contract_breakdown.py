@@ -12,10 +12,11 @@ import os
 import re
 from collections import defaultdict
 import pandas as pd
-import matplotlib.pyplot as plt
+import matplotlib
 import numpy as np
 from vulnerability_metrics import extract_swc_id, extract_filename, determine_dasp_category
-
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 from vd_score_calculator import calculate_vd_score
 
 def load_ground_truth(ground_truth_file):
@@ -89,7 +90,7 @@ def analyze_by_tool(output_files, ground_truth_data):
                     continue
                 
                 tool_results[tool]['files_analyzed'].add(file_path)
-                print("Analyzed contract entry in dataset: " + file_path)
+                # print("Analyzed contract entry in dataset: " + file_path)
                 
                 swc_id = extract_swc_id(row.get('SWC-ID', ''))
                 vulnerability = row.get('Vulnerability', '')
@@ -105,9 +106,9 @@ def analyze_by_tool(output_files, ground_truth_data):
                     else:
                         tool_results[tool]['false_positives'] += 1
                         tool_results[tool]['by_category'][detected_category]['false_positives'] += 1
-                else:
-                    tool_results[tool]['false_positives'] += 1
-                    tool_results[tool]['by_category'][detected_category]['false_positives'] += 1
+                # else:
+                #     tool_results[tool]['false_positives'] += 1
+                #     tool_results[tool]['by_category'][detected_category]['false_positives'] += 1
     
     for tool, results in tool_results.items():
         tp = results['true_positives']
