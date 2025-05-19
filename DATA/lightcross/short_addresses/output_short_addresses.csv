@@ -1,3 +1,4 @@
 Tool,File,Contract,Vulnerability,Severity,SWC-ID,Remediation,Description/More Info,Execution time,Total Time
-mythril,smartbugs-dataset/short_addresses/short_address_example.sol,MyToken,Exception State,Medium,SWC-ID: https://swcregistry.io/docs/SWC-110,An assertion violation was triggered.,Estimated Gas Usage: 36 - 131,12.257892370223999,12.969510555267334
-mythril,smartbugs-dataset/short_addresses/short_address_example.sol,MyToken,Exception State,Medium,SWC-ID: https://swcregistry.io/docs/SWC-110,An assertion violation was triggered.,Estimated Gas Usage: 82 - 177,12.257892370223999,12.969510555267334
+mythril,smartbugs-dataset/short_addresses/short_address_example.sol,MyToken,Exception State,Medium,SWC-ID: https://swcregistry.io/docs/SWC-110,An assertion violation was triggered.,Estimated Gas Usage: 36 - 131,11.396363019943237,17.036639213562012
+mythril,smartbugs-dataset/short_addresses/short_address_example.sol,MyToken,Exception State,Medium,SWC-ID: https://swcregistry.io/docs/SWC-110,An assertion violation was triggered.,Estimated Gas Usage: 82 - 177,11.396363019943237,17.036639213562012
+slither,smartbugs-dataset/short_addresses/short_address_example.sol,MyToken,Exception State,Medium,SWC-ID: https://swcregistry.io/docs/SWC-110,An assertion violation was triggered.,Estimated Gas Usage: 82 - 177,5.0096363019943237,17.036639213562012
