@@ -5,6 +5,9 @@
  #install.packages("reshape2");
  #install.packages("plyr")
  #install.packages("viridis")
+ #install.packages("renv")
+# install.packages('irkernel')
+# irkernel::installspec(user = false) # to install irkernel for jupyter notebook
 
 # renv package
 # renv::init() # automatically install the packages declared in the lockfile
@@ -24,5 +27,5 @@ library(renv)
 library(readr)
 library(kableExtra)
 library(huxtable)
-library(purrr)  # For map functions
+library(purrr)
 

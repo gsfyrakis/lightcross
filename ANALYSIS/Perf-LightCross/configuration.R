@@ -14,7 +14,7 @@ theme_set(
     )
 
 )
-custom_colors <- scale_fill_manual(values = c( "#56B4E9", "#E69F00", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"))
+custom_colors <- scale_fill_manual(values = c( "#56B4E9", "#009E73", "#0072B2", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"))
 
 # paper folders
 paperDataFolderPath <- "../benchmark/"
