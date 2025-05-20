@@ -15,7 +15,7 @@ def parse_args():
     Parse command line arguments
     """
     parser = argparse.ArgumentParser(
-        description='Map smart contract vulnerabilities from multiple output files to openscvfull.csv'
+        description='Map smart contract vulnerabilities from multiple output files to openscv-full.csv'
     )
 
     parser.add_argument(
@@ -28,8 +28,8 @@ def parse_args():
     parser.add_argument(
         '--openscv',
         type=str,
-        default='openscvfull.csv',
-        help='Path to the openscvfull.csv file (default: openscvfull.csv)'
+        default='openscv-full.csv',
+        help='Path to the openscv-full.csv file (default: openscvfull.csv)'
     )
 
     parser.add_argument(
@@ -59,16 +59,13 @@ def parse_args():
 
     args = parser.parse_args()
 
-    # If no input files specified, use a default pattern
     if not args.input:
         args.input = ['output_*.csv']
 
-    # If no export format is specified, enable both by default
     if not args.csv and not args.json:
         args.csv = True
         args.json = True
 
-    # Enable visualization by default
     if not args.visualize:
         args.visualize = True
 
@@ -89,13 +86,11 @@ def expand_input_files(input_patterns):
 
     for pattern in input_patterns:
         if '*' in pattern or '?' in pattern:
-            # This is a glob pattern
             matching_files = glob.glob(pattern)
             if not matching_files:
                 print(f"Warning: No files found matching pattern '{pattern}'")
             expanded_files.extend(matching_files)
         else:
-            # This is a single file
             expanded_files.append(pattern)
 
     return expanded_files
@@ -119,7 +114,7 @@ def main():
 
     os.makedirs(args.output_dir, exist_ok=True)
 
-    print(f"Initializing OpenSCV mapper with:")
+    print("Initializing OpenSCV mapper with:")
     print(f"  - {len(input_files)} input file(s)")
     for f in input_files:
         print(f"    - {f}")
@@ -157,7 +152,6 @@ def main():
                 print(f"    Match rate: {cat_stats['match_rate']}%")
 
         print("\nTop 5 SWC-IDs:")
-        # Print top 5 SWC-IDs
         sorted_swcs = sorted(statistics['swc_counts'].items(), key=lambda x: x[1], reverse=True)
         for i, (swc_id, count) in enumerate(sorted_swcs[:5], 1):
             print(f"{i}. {swc_id}: {count} occurrences")

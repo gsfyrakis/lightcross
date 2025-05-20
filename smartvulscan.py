@@ -247,6 +247,8 @@ def format_results(s_output, file_name, tool_time):
     output = []
     swc_id = " "
     contract = " "
+    print("output for file: " + file_name +  "\n")
+    print(s_output)
 
     # Extract summary
     pre_summary = re.findall(r'Summary([\s\S]*?)##', s_output)
@@ -263,7 +265,6 @@ def format_results(s_output, file_name, tool_time):
     }
 
     for issue in issues:
-
         issue_name, impact, confidence, details = issue
         print("issue Name: " + issue_name)
         # Extract IDs and their details
@@ -380,14 +381,12 @@ def main():
         print(f"\n > analyzing file: {file_path}\n")
         formatted_output = []
 
-        # Run Slither if selected
         if selected_tools in ['slither', 'both']:
             print(f"Running Slither analysis on {file_path}")
             slither_output = analyse_smart_contract_with_slither(file_path)
             for slither_out in slither_output:
                 formatted_output.append(slither_out)
 
-        # Run Mythril if selected
         if selected_tools in ['mythril', 'both']:
             print(f"Running Mythril analysis on {file_path}")
             mythril_output = analyse_smart_contract_with_mythril(file_path)
@@ -402,6 +401,160 @@ def main():
     print(f"Smart Contract scanned successfully using {tools_used}!")
     print(f"Time taken: {elapsed_time} seconds")
 
+
+def create_swc_dasp_mapping():
+    """
+    Creates a mapping from Smart Contract Weakness Classification (SWC)
+    IDs to Decentralized Application Security Project (DASP) categories.
+
+    Returns:
+        dict: A dictionary with SWC IDs as keys and DASP categories as values.
+    """
+
+    DASP_CATEGORIES = {
+        1: "Reentrancy",
+        2: "Access Control",
+        3: "Arithmetic Issues",
+        4: "Unchecked Return Values",
+        5: "Denial of Service",
+        6: "Bad Randomness",
+        7: "Front-Running",
+        8: "Time Manipulation",
+        9: "Short Address/Parameter Attack",
+        10: "Unknown Unknowns"
+    }
+
+    # Create mapping from SWC IDs to DASP categories
+    swc_to_dasp = {
+        # DASP-1: Reentrancy
+        "SWC-107": 1,  # Reentrancy
+
+        # DASP-2: Access Control
+        "SWC-105": 2,  # Unprotected Ether Withdrawal
+        "SWC-106": 2,  # Unprotected SELFDESTRUCT Instruction
+        "SWC-115": 2,  # Authorization through tx.origin
+        "SWC-118": 2,  # Incorrect Constructor Name
+        "SWC-123": 2,  # Requirement Violation
+        "SWC-124": 2,  # Write to Arbitrary Storage Location
+        "SWC-125": 2,  # Incorrect Inheritance Order
+        "SWC-132": 2,  # Unexpected Ether Balance
+
+        # DASP-3: Arithmetic Issues
+        "SWC-101": 3,  # Integer Overflow and Underflow
+        "SWC-128": 3,  # DoS With Block Gas Limit (has arithmetic aspects)
+        "SWC-129": 3,  # Typographical Error (related to arithmetic)
+        "SWC-130": 3,  # Right-To-Left-Override control character
+        "SWC-131": 3,  # Presence of unused variables
+
+        # DASP-4: Unchecked Return Values
+        "SWC-104": 4,  # Unchecked Call Return Value
+        "SWC-113": 4,  # DoS with Failed Call (related to unchecked returns)
+
+        # DASP-5: Denial of Service
+        "SWC-113": 5,  # DoS with Failed Call (also relevant to DASP-4)
+        "SWC-114": 5,  # Transaction Order Dependence
+        "SWC-128": 5,  # DoS With Block Gas Limit
+        "SWC-129": 5,  # Typographical Error (can cause DoS)
+        "SWC-133": 5,  # Hash Collisions With Multiple Variable Length Arguments
+        "SWC-135": 5,  # Code With No Effects
+        "SWC-138": 5,  # Unrestricted Low-Level Calls
+
+        # DASP-6: Bad Randomness
+        "SWC-116": 6,  # Block values as a proxy for time
+        "SWC-120": 6,  # Weak Sources of Randomness from Chain Attributes
+
+        # DASP-7: Front-Running
+        "SWC-114": 7,  # Transaction Order Dependence (also relevant to DASP-5)
+        "SWC-127": 7,  # Timestamp Dependence (can enable front-running)
+
+        # DASP-8: Time Manipulation
+        "SWC-116": 8,  # Block values as a proxy for time (also in DASP-6)
+        "SWC-127": 8,  # Timestamp Dependence
+
+        # DASP-9: Short Address/Parameter Attack
+        "SWC-133": 9,  # Hash Collisions With Multiple Variable Length Arguments
+
+        # DASP-10: Unknown Unknowns (miscellaneous)
+        "SWC-100": 10,  # Function Default Visibility
+        "SWC-102": 10,  # Outdated Compiler Version
+        "SWC-103": 10,  # Floating Pragma
+        "SWC-108": 10,  # State Variable Default Visibility
+        "SWC-109": 10,  # Uninitialized Storage Pointer
+        "SWC-110": 10,  # Assert Violation
+        "SWC-111": 10,  # Use of Deprecated Functions
+        "SWC-112": 10,  # Delegatecall to Untrusted Callee
+        "SWC-117": 10,  # Signature Malleability
+        "SWC-119": 10,  # Shadowing State Variables
+        "SWC-121": 10,  # Missing Protection against Signature Replay Attacks
+        "SWC-122": 10,  # Lack of Proper Signature Verification
+        "SWC-126": 10,  # Insufficient Gas Griefing
+        "SWC-134": 10,  # Message call with hardcoded gas amount
+        "SWC-136": 10,  # Unencrypted Private Data On-Chain
+        "SWC-137": 10,  # Signature Malleability
+    }
+
+    swc_to_dasp_details = {
+        swc_id: {
+            "dasp_id": dasp_id,
+            "dasp_category": DASP_CATEGORIES[dasp_id]
+        }
+        for swc_id, dasp_id in swc_to_dasp.items()
+    }
+
+    return swc_to_dasp_details
+
+
+def get_swcs_by_dasp_category(dasp_id):
+    """
+    Retrieves all SWC IDs associated with a specific DASP category.
+
+    Args:
+        dasp_id (int): The DASP category ID (1-10)
+
+    Returns:
+        list: List of SWC IDs that fall under the specified DASP category
+    """
+    mapping = create_swc_dasp_mapping()
+    return [swc_id for swc_id, details in mapping.items() if details["dasp_id"] == dasp_id]
+
+
+def get_dasp_from_swc(swc_id):
+    """
+    Get the DASP category for a specific SWC ID.
+
+    Args:
+        swc_id (str): The SWC ID (e.g., "SWC-107" or just "107")
+
+    Returns:
+        dict: Information about the DASP category or None if not found
+    """
+    if not swc_id.startswith("SWC-"):
+        swc_id = f"SWC-{swc_id}"
+
+    mapping = create_swc_dasp_mapping()
+    if swc_id in mapping:
+        return {
+            "swc_id": swc_id,
+            "dasp_id": mapping[swc_id]["dasp_id"],
+            "dasp_category": mapping[swc_id]["dasp_category"]
+        }
+    return None
+
+
+if __name__ == "__main__":
+    swc_dasp_mapping = create_swc_dasp_mapping()
+
+    print("Complete SWC to DASP Mapping:")
+    for swc_id, details in swc_dasp_mapping.items():
+        print(f"{swc_id}: DASP-{details['dasp_id']} ({details['dasp_category']})")
+
+    print("\n")
+
+    dasp2_swcs = get_swcs_by_dasp_category(2)
+    print(f"SWCs in DASP-2 (Access Control): {', '.join(dasp2_swcs)}")
+
+    dasp5_swcs = get_swcs_by_dasp_category(5)
+    print(f"SWCs in DASP-5 (Denial of Service): {', '.join(dasp5_swcs)}")
 
 if __name__ == "__main__":
     main()
