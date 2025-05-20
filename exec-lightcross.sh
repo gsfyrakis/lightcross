@@ -36,15 +36,15 @@ done
 echo "Running analysis with tool(s): $TOOLS"
 
 folders=(
-  "access_control"
-  "bad_randomness"
-  "denial_of_service"
-  "front_running"
-  "other"
-  "reentrancy"
-  "short_addresses"
-  "time_manipulation"
-  "unchecked_low_level_calls"
+   "access_control"
+   "bad_randomness"
+   "denial_of_service"
+   "front_running"
+   "other"
+   "reentrancy"
+   "short_addresses"
+   "time_manipulation"
+   "unchecked_low_level_calls"
 )
 
 for folder in "${folders[@]}"
