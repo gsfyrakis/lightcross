@@ -1,4 +1,4 @@
-# LightCross
+# LightCross: Smart Contract Vulnerability Detection Tool
 
 LightCross is a lightweight tool for detecting vulnerabilities in Ethereum smart contracts. This tool combines the analysis capabilities of industry-standard security tools like Slither and Mythril to provide a thorough vulnerability assessment framework.
 
